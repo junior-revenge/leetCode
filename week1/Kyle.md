@@ -55,3 +55,27 @@ class Solution(object):
 
 첫 포인터는 array를 따라 쭉 움직이고
 두 번째 포인터는 "이 다음에 올 val과 일치하지 않는 요소가 어디에 위치해야하는지에 대한 정보"를 나타내야 한다. 예를 들어 첫번째 요소가 val과 일치하지 않는다면, 그 다음에 val과 일치하지 않는 요소를 또 발견했을 경우, 이 첫번째 요소 바로 뒤에 놓여져야 한다는 정보를 저장하는 것이다.
+
+# 26. Remove Duplicates from Sorted Array
+
+## Solution
+```python
+class Solution(object):
+    def removeDuplicates(self, nums):
+        second_pointer = 1
+        for i in range(len(nums)-1):
+            if nums[i] != nums[i+1]:
+                nums[second_pointer] = nums[i+1]
+                second_pointer += 1
+        return second_pointer
+```
+
+## Key Takeway
+이전 문제와 마찬가지로 투포인터를 떠올릴 수 있다.
+
+시작을 했을 때, 이 다음 값과 같은지 비교해서,
+
+1) 같으면 그냥 넘어간다.
+2) 다르면 그 값을 가져오고 고유한 값의 수를 나타내는 두번째 포인터의 값을 하나 올린다. 이 값은 다음 고유한 값의 위치이기도 하다.
+
+두번째 포인터는 1에서 시작하더라도 언제나 인덱스 역할의 첫 번째 포인터보다 느리고, 배열은 정렬되어있으므로, 두 번째 포인터의 위치에서만 값을 업데이트해주더라도 전혀 문제가 발생하지 않는다.

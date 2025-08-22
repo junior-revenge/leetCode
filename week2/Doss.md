@@ -197,3 +197,63 @@ int myAtoi(string s) {
     return ans * min;
 }
 ```
+
+# Palindrome Number
+
+Given an integer x, return true if x is a, and false otherwise.
+
+Example 1:
+
+Input: x = 121
+Output: true
+Explanation: 121 reads as 121 from left to right and from right to left.
+
+Example 2:
+
+Input: x = -121
+Output: false
+Explanation: From left to right, it reads -121. From right to left, it becomes 121-. Therefore it is not a palindrome.
+
+Example 3:
+
+Input: x = 10
+Output: false
+Explanation: Reads 01 from right to left. Therefore it is not a palindrome.
+
+## Solution
+
+```cpp
+bool isPalindrome(int x) {
+    if(x < 0) return false;
+    else if(x < 10) return true;
+
+    auto box = vector<int>();
+
+    while(x != 0) {
+        auto tmp = x/10;
+
+        if(x != 0) box.push_back(x - tmp*10);
+
+        x = tmp;
+    }
+
+    auto mid = 0;
+
+    if(box.size() % 2 == 0) mid = box.size() / 2;
+    else mid = box.size() / 2 + 1;
+
+    auto start = 0;
+    auto end = box.size() - 1;
+
+    cout<<mid<<" "<<end;
+
+    while(mid<=end) {
+        if(box[start] != box[end]) return false;
+
+        start++;
+        end--;
+    }
+
+    return true;
+}
+```

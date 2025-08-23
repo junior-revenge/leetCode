@@ -110,3 +110,44 @@ public class Solution {
 
 
 # Valid Parenthese 20
+
+## 문제 설명
+괄호가 성립되는지 확인 
+
+## solution
+
+```java
+class Solution {
+    public boolean isValid(String s) {
+        
+        // string을 character 배열로 만들어야해 
+        char[] brackets = s.toCharArray();
+
+        // 그래서 이걸 어떻게 꺼내서 쌍이 맞는지 비교할껀데?? 
+        Stack<Character> stack = new Stack<>();
+
+        // 열린 괄호가 다음 문자열이 닫힌 괄호여야 꺼낼수잇다. 
+
+        for(char c : brackets) {
+
+            if(c == '{' || c == '[' || c == '(' ){
+                stack.push(c);
+            }
+            // 닫는 괄호가 먼저 나올수있음 
+            if(stack.isEmpty()) {return false;}
+            
+            // char top = stack.peek();
+
+            if((stack.peek() == '{' && c == '}') || 
+               (stack.peek() == '[' && c == ']') || 
+               (stack.peek() == '(' && c == ')')){
+                stack.pop();
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
+## 접근 아이디어 
+스택을 사용하는 이유 가장 최근에 열린괄호는 닫힌괄호가 바로 나와야 괄호가 성립, 열린 괄호를 기억하고 닫힌괄호가 짝이 맞아야한다. 

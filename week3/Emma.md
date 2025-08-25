@@ -54,3 +54,28 @@ If n is less than 0, it means we have already planted at least the required numb
             return n <= 0;
     }
 ```
+
+# Problem 169. Majority Element
+Given an array nums of size n, return the majority element.
+
+The majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.
+
+ ## Solution
+ We need to store how many times each number appears in the array. The best data structure is Hashmap. So first declare a hashmap, along with an integer variable `major` to store the current majority frequency, and another integer vartiable `majorNum` to store the number that correspondes to the majority. As we traverse the array, we put each number into hashmap with the number as the key, and its frequency as the value. Since key can not be duplicated, if we put same key, we increase its frequency by 1 using getOrDefault method (_this was the part I didn't know before).  
+ While adding value to the hashMap, we compare the frequency of current number with the current majority(`major`). If current value is greater than `major`, we update `major` to the frequency of current number and set `majorNum` to the current number.
+ ```
+  public int majorityElement(int[] nums) {
+        HashMap<Integer, Integer> hash = new HashMap<>();
+        int major = 0;
+        int majorNum = 0;
+        
+        for(int n : nums ){
+            hash.put(n, hash.getOrDefault(n,0)+1);
+            if(hash.get(n)>major) {
+                major = hash.get(n);
+                majorNum = n;
+            }
+        }
+        return majorNum;
+    }
+ ```

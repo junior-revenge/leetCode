@@ -31,10 +31,18 @@ class Solution(object):
 class Solution(object):
     def majorityElement(self, nums):
 
+        nums_map = Counter(nums)
+        major_element = max(nums_map, key=nums_map.get)
+        
+        return major_element
 ```
 
 ## Key Takeway
+해시맵의 요소로 먼저 nums의 값들을 쫙 깔아줘야 한다.
+defaultdict를 이용하면 찾는 값이 key에 없어도 에러를 내지않고 자동으로 추가한다.
+그리고 for문으로 nums의 각 요소들을 깔아주는데, 이 때 i는 포인터가 아닌 실제 요소 값이어야 하고, 이에 대해 동일한게 나오면 1씩 더하도록 코드를 짠다.
 
+그 후에 해시맵의 모든 요소를 한 번 순회하면서 majority_value보다 값이 큰 key를 return하면 끝.
 
 # 189. Rotate Array
 

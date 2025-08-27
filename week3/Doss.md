@@ -65,3 +65,81 @@ public:
     }
 };
 ```
+
+# 16. 3Sum Closest
+
+Given an integer array nums of length n and an integer target, find three integers in nums such that the sum is closest to target.
+
+Return the sum of the three integers.
+
+You may assume that each input would have exactly one solution.
+
+Example 1:
+
+Input: nums = [-1,2,1,-4], target = 1
+Output: 2
+Explanation: The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+
+Example 2:
+
+Input: nums = [0,0,0], target = 1
+Output: 0
+Explanation: The sum that is closest to the target is 0. (0 + 0 + 0 = 0).
+
+## Solution
+
+```cpp
+int threeSumClosest(vector<int>& nums, int target) {
+    sort(nums.begin(), nums.end());
+
+    auto ans = 0;
+    auto dif = INT_MAX;
+    auto siz = nums.size();
+
+    for(size_t piv=0; piv<siz-2;piv++) {
+        auto start = piv+1;
+        auto end = siz-1;
+
+        while(start<end) {
+            auto sum = nums[piv] + nums[start] + nums[end];
+            auto gap = abs(target - sum);
+
+            if(gap < dif) {
+                dif = gap;
+                ans = sum;
+            }
+
+            if(sum == target) return sum;
+            else if(sum > target) {
+                end--;
+            }
+            else if(sum < target) {
+                start++;
+            }
+        }
+    }
+
+    return ans;
+}
+```
+
+# Letter Combinations of a Phone Number
+
+Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent. Return the answer in any order.
+
+A mapping of digits to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
+
+Example 1:
+
+Input: digits = "23"
+Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+
+Example 2:
+
+Input: digits = ""
+Output: []
+
+Example 3:
+
+Input: digits = "2"
+Output: ["a","b","c"]

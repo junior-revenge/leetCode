@@ -143,3 +143,36 @@ Example 3:
 
 Input: digits = "2"
 Output: ["a","b","c"]
+
+## Solution
+
+```cpp
+vector<string> letterCombinations(string digits) {
+    auto m = map<char, string> {
+        { '2', "abc" }, { '3', "def" },
+        { '4', "ghi" }, { '5', "jkl" },
+        { '6', "mno" }, { '7', "pqrs"},
+        { '8', "tuv" }, { '9', "wxyz"}
+    };
+
+    auto ans = vector<string>();
+    if(digits.empty()) return ans;
+
+    ans.push_back("");
+
+    for(auto digit : digits) {
+        auto str = m[digit];
+        auto temp = vector<string>();
+
+        for(auto& comb : ans) {
+            for(auto c : str) {
+                temp.push_back(comb + c);   
+            }
+        }
+
+        ans = temp;
+    }
+
+    return ans;
+}
+```

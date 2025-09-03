@@ -79,6 +79,7 @@ class Solution:
 이건 그냥 brute force solution을 말한다.
 모든 경우의 수를 조사하는 것. 그러나 여기에서도 재귀호출이 쓰인다.
 
+```python
 class Solution:
     def canJumpFromPosition(self, position, nums):
         if position == len(nums) - 1:
@@ -91,6 +92,7 @@ class Solution:
 
     def canJump(self, nums):
         return self.canJumpFromPosition(0, nums)
+```
 
 기본적인 아이디어는 매 position마다 가장 멀리 갈 수 있는 furthestJump를 구한 뒤, 현재 위치 + 1과 furthestJump + 1 위치 사이에서 재귀호출을 통해 값을 구하는 것이다. 무수히 깊은 재귀 호출 트리에서 한 번이라도 True가 나오면 전체 결과가 True가 나오지만 그러지 못하면 False가 나온다.
 이 때 next position을 왼쪽부터가 아니라 오른쪽부터 체크하면 이론상으론 똑같아도 실질적으론 더 빨라진다. 즉 nextPosition을 furthestJump에서 시작해서 하나씩 내려오면 된다는 것.
@@ -101,6 +103,7 @@ class Solution:
 
 그러나 위와 같이 매 인덱스마다 유효한지 아닌지를 판단할 때, 한 번 유효하지 않은 인덱스라고 판단되면 다른 재귀 호출 트리에서 여기를 굳이 다시 방문할 필요가 사라진다. 따라서 메모이제이션을 적용해본다. 즉, 탑다운 동적계획법을 써보는 것.
 
+```python
 class Solution:
     def __init__(self):
         self.memo = []
@@ -122,6 +125,7 @@ class Solution:
         self.memo = [-1] * len(nums)  # -1 for unknown, 0 for bad, 1 for good
         self.memo[-1] = 1  # The last position is always "good"
         return self.canJumpFromPosition(0)
+```
 
 memo를 배열과 같은 길이로 만들어두고 전부 -1을 넣어둔 뒤 -1이 아닌 다른 값이 저장되어있으면 그걸 사용한다.
 그 외의 로직은 같다. 이미 방문한 포지션인데 if문 조건에 해당되어 True라면 그 사실을 1이라는 값으로 저장한다.
@@ -137,6 +141,7 @@ memo를 배열과 같은 길이로 만들어두고 전부 -1을 넣어둔 뒤 -1
 
 우리가 왼쪽에서 오른쪽으로 점프한다는 점은, 오른쪽에서 조사를 시작하면 조사 위치의 우측에 위치한 요소들을 조사할 때는 이미 조사를 완료되어있을 것이고, 따라서 이를 캐싱해두면 큰 이득을 볼 수 있다는 것이다. 이러면 재귀를 안해도 된다. 
 
+```python
 class Solution(object):
     def canJump(self, nums):
         GOOD, BAD, UNKNOWN = 1, 0, -1
@@ -149,7 +154,8 @@ class Solution(object):
                     memo[i] = GOOD
                     break
         return memo[0] == GOOD
-			
+```
+
 표지를 가능, 불가능, 미확인 3 상태로 놓고, 가장 마지막 요소는 항상 가능하므로 GOOD으로 맞춰둔다. 그리고 끝에서부터 시작해서 한 칸씩 왼쪽으로 이동해가며 앞에서 본 같은 로직 즉 두 경우 중 최소값으로 점프 가능 여부를 판단하는 반복문을 작성한다. 
 그런데 이렇게 해도 시간 복잡도는 여전히 O(N^2)이고 공간복잡도도 O(N)이다. 
 
@@ -164,6 +170,7 @@ currPosition + nums[currPosition] >= leftmostGoodIndex
 
 그래서 이 코드는 아래와 같이 극한으로 최적화된다:
 
+```python
 class Solution:
     def canJump(self, nums: List[int]) -> bool:
         lastPos = len(nums) - 1
@@ -171,5 +178,6 @@ class Solution:
             if i + nums[i] >= lastPos:
                 lastPos = i
         return lastPos == 0
-				
+```
+			
 이러면 시간복잡도는 O(N)이다. 원패스로 해결하기 때문. 공간복잡도는 아예 캐싱조차 안하므로 O(1)이다. 

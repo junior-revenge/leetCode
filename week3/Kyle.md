@@ -75,7 +75,7 @@ class Solution:
 이건 동적 계획법으로 푸는 문제다. 
 보통 아래 4단계를 거쳐 차례대로 풀면 된다.
 
-# Start with the recursive backtracking solution
+### Start with the recursive backtracking solution
 이건 그냥 brute force solution을 말한다.
 모든 경우의 수를 조사하는 것. 그러나 여기에서도 재귀호출이 쓰인다.
 
@@ -97,7 +97,7 @@ class Solution:
 
 어쨌든 이러면 시간복잡도가 2^n이 나와서 아주 느려진다(정확히는 2보다 작은 어떤 수의 n거듭제곱에 근사한다). 여기서 N은 배열의 길이다. 공간복잡도는 재귀 호출 스택만큼인 O(N)이 된다.
 
-# Optimize by using a memoization table (top-down dynamic programming)
+### Optimize by using a memoization table (top-down dynamic programming)
 
 그러나 위와 같이 매 인덱스마다 유효한지 아닌지를 판단할 때, 한 번 유효하지 않은 인덱스라고 판단되면 다른 재귀 호출 트리에서 여기를 굳이 다시 방문할 필요가 사라진다. 따라서 메모이제이션을 적용해본다. 즉, 탑다운 동적계획법을 써보는 것.
 
@@ -129,7 +129,7 @@ memo를 배열과 같은 길이로 만들어두고 전부 -1을 넣어둔 뒤 -1
 이러면 시간복잡도가 O(N^2)가 나온다. 공간복잡도는 재귀 깊이로 인한 N과 메모때문에 생기는 N으로 2N이 되니 O(N)이다.
 
 
-# Remove the need for recursion (bottom-up dynamic programming)
+### Remove the need for recursion (bottom-up dynamic programming)
 
 이제 Top-down DP에서 Bottom-up DP로 바꿔보자. 타뷸레이션 기법을 사용하는 바텀업 DP는 재귀가 아닌 iteration을 통해 bottom-up으로 문제를 해결하며, 데이터는 주어진 배열이나 테이블(위 예시에선 그냥 cache라는 이름의 배열)에 저장한다. 재귀 스택에 들어가는 연산을 아끼므로 모든 경우를 다 평가할 때는 바텀업이 탑다운 DP보다 빠르다. 또 재귀를 없앤 것만으로도 추가적인 최적화를 가능케 하기도 한다.
 
@@ -154,7 +154,7 @@ class Solution(object):
 그런데 이렇게 해도 시간 복잡도는 여전히 O(N^2)이고 공간복잡도도 O(N)이다. 
 
 
-#Apply final tricks to reduce the time / memory complexity
+### Apply final tricks to reduce the time / memory complexity
 
 이제 여기서 더 최적화를 가려면, 그리디 알고리듬을 적용할 구석을 찾는다. 그리디 알고리듬을 마음 편하게 쓰려면 한 번 내린 결정을 뒤돌아보지 않고 앞으로 진행해도 된다는 확신, 즉 로컬 옵티멈이 글로벌 옵티멈이라는 확신이 있어야 한다. 위 코드를 보면, 어떤 위치 i가 GOOD인지 확인하기 위해 이 다음 어딘가에 있는 첫 번째 GOOD을 j로 탐색하고 있다. i기준 그 오른쪽으로 쭉 j들을 찾다가 한 번이라도 GOOD이 나오면 이 i는 곧바로 GOOD이 되어버린다. 이 말인 즉, 만약 어떤 지점 i를 기준으로 그 오른쪽에 있는 요소중 가장 왼쪽 즉 처음 나타나는 GOOD 위치를 별도의 변수로 저장해둔다면, 이 뒤로 요소 순회가 일어나는 것을 막을 수 있다. 이러면 배열 자체를 안 써도 된다. 
 

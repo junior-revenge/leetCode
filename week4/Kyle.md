@@ -139,6 +139,7 @@ class Solution:
 
 이러면 정렬이고 나발이고 필요없다. 그냥 원패스로 계산 가능.
 
+```python
 class Solution:
     def hIndex(self, citations):
         n = len(citations)
@@ -154,7 +155,7 @@ class Solution:
             k -= 1
             s += papers[k]
         return k
-
+```
 이러면 압도적 시간복잡도 O(N)이 나온다.
 다르게 설명하면, 
 우리가 n+1개의 0으로 가득찬 papers를 만드는 이유는 n보다 큰 인용수는 그냥 n으로 치환하고 말것이기 때문이다.

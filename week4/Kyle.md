@@ -64,7 +64,21 @@ i + 1에서 [0, 4]를 조사할 수 있어도 [3, 4]만 조사하겠다는 식. 
 
 ## Solution
 ```python
-class Solution(object):
+class Solution:
+    def hIndex(self, citations):
+        n = len(citations)
+        papers = [0] * (n + 1)
+        # Count how many papers have each citation count (cap at n)
+        for c in citations:
+            papers[min(n, c)] += 1
+
+        # Find the h-index
+        k = n
+        s = papers[n]
+        while k > s:
+            k -= 1
+            s += papers[k]
+        return k
 
 ```
 

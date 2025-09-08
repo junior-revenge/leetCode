@@ -69,7 +69,78 @@ class Solution(object):
 ```
 
 ## Key Takeway
-이 
+우선 brute force로 다가가봄직하다. 이게 h 인덱스 계산하는 방식이 좀 특이해서 시행착오는 겪겠지만, 결국 최대값을 찾고, 그 값이 배열 안에서 몇 번 나타나는지를 확인하며 순회하면 된다.
+이 때 놓치기 쉬운 것이, max값이 당장 그 값만큼 나타나지 않으면 바로 잊을 수 있는데, [11, 15]의 케이스처럼 배열 안에 없는 값이라도 h인덱스가 될 수 있다. 이 경우엔 2가 될 것.
+그래서 h인덱스가 될 값 자체는 배열에 없더라도 1씩 줄여가며 계속 조사해야한다.
+
+```python
+class Solution(object):
+    def hIndex(self, citations):
+        original_array = citations[:]
+        max_val = max(citations)
+        while max_val > 0:
+            count = len([num for num in original_array if num >= max_val])
+            if count >= max_val:
+                return max_val
+            if max_val in citations:
+                citations.remove(max_val)
+            max_val -= 1
+        return 0
+```
+
+최종적으로 이렇게 하면 문제는 풀 수 있다. 시간복잡도는 O(N)이 된다. 순회는 한번만 이루어지고 max값을 찾는 것은 max값만큼의 연산을 하면 되므로 O(max * N)이 되는데 그래서 O(mN)이다. 공간 복잡도는 배열 하나를 따로 관리하므로 역시 O(N)이다.
+
+이걸 수학적으로 접근하면, 그래프를 그려보면 x축에 논문의 수, y축에 인용횟수를 놓고 봤을 때 정사각형을 그릴 수 있는 최대의 변의 길이 h를 구하는 것과 같다. 따라서 배열을 내림차순(오름차순이면 뒤에서부터 조사하면 됨)으로 정렬한 후 그 너비가 최대가 되는 정사각형의 한 변의 길이를 구해도 된다.
+
+그렇게 하면 인용횟수가 인덱스보다 큰 인덱스까지 셈을 한 뒤에 거기에 1을 더한 값(인덱스는 0부터 시작이니까 i + 1)을 h인덱스로 산출하면 된다. 
+이렇게 하면 나머지 논문들(n - (i + 1))은 인용횟수가 i+1보다 작아야만 한다.
+
+그래서 sorting에 시간복잡도를 조금 소모한 후 전체 배열을 각 인덱스에 대해 위 조건에 해당하는지만 따져서 더한 뒤 반환하면 끝이다.
+
+```python
+class Solution:
+    def hIndex(self, citations):
+        # Sort the citations in ascending order
+        citations.sort()
+        i = 0
+        n = len(citations)
+        # Linear search from the end
+        while i < n and citations[n - 1 - i] > i:
+            i += 1
+        return i
+
+```
+이러면 시간복잡도가 O(NlogN)이 나온다. 이게 O(mN)보다 빠르다. m이 굉장히 커질 수 있으므로. 물론 정렬 후 binary search로 값을 찾을 수도 있는데 이래봐야 O(NlogN)을 더 빠르게는 못만든다. 애초에 정렬할 때 O(NlogN)보다 빠를 수가 없어서.
+<img width="1400" height="1000" alt="image" src="https://github.com/user-attachments/assets/5bca4f07-15d2-495b-b9c8-449ab728bbac" />
+
+그래서 이걸 더 최적화하려면 정렬 알고리듬을 건드려야 한다. Heap 정렬이나 Merge 정렬, Quick 정렬등은 아무리 빨라도 O(NlogN)보다 빨라질 수 없다. 그래서 새로운 정렬법인 counting 정렬을 사용한다. 이 정렬은 자주 쓰이진 않지만 integer한해서 비교없이 정렬이 가능하기에 배열 속 정수의 값이 너무 크지만 않으면 대체로 빠르다.
+카운팅 정렬은 기본적으로 고유한 값에 어떤 수식을 적용해 이 값이 위치해야하는 곳의 인덱스를 구해 그리로 바로 옮기는 방식으로 정렬한다. 다만 우리의 데이터는 논문의 수보다 논문이 가진 인용횟수가 훨씬 클 수 있다는 문제점이 있어서 이 정렬이 효율적이지 않을 수 있다.
+
+그러나, 우리는 면적이 최대가 되는 정사각형만 찾으면 되기때문에, 인용횟수가 n보다 큰 논문들은 그 인용횟수를 n이라고 치환해버려도 h 인덱스 계산에 영향을 안미치게 된다. 그러면 앞에서 정렬로직을 이걸로 치환하면 더 나은 해법을 얻게 된다.
+<img width="714" height="617" alt="image" src="https://github.com/user-attachments/assets/6c54a61e-8205-4779-8b3b-8f2f30da84fc" />
+
+하지만 여기서 한 발자국 더 나아갈 수도 있다. 만약 우리가 치환이 가능하단걸 깨달았다면, 여기서 정렬 자체를 건너뛸 수도 있다. 왜냐하면 인용횟수에서 바로 h인덱스를 구할 수 있기 때문이다. 어떤 정수 i가 있을 때, 그 i보다 더 크거나 같은 인용횟수를 가진 논문의 갯수의 합을 s(i)라고 정의했다고 치자. 그러면 [1, 3, 2, 3, 100] 이렇게 있을 때 그 s(i) 값은 i가 0일때, 5가 되고 i가 1일 때도 5가 되고 i가 2일때는 4가 되고 i가 3일때는 3이되고 i가 4일 때는 1이 되고 i가 5일때는 1이 될 것이다. 그리고 여기서 i가 더 커지더라도 100전까지는 값이 계속 1일 것이다.
+우리의 h인덱스는 이 i들 사이에서 s(i)보다 작거나 같은 i중 가장 큰 숫자다. 즉 i는 0부터 쭉 무한히 커지고, s(i)는 최대 5에서 시작해서 5, 4, 3, 1, 1 ... 0 이렇게 쭉 작아지니까 i가 s(i)보다 작거나 같은 경우는 i가 0일때 s(i)가 5, i가 1일 때 s(i)가 5, i가 2일 때 s(i)가 4, i가 3일 때 s(i)가 3이고 이 뒤로는 i가 커져도 s(i)는 계속 작아진다. 즉 우리의 h인덱스는 3이다.
+
+이건 100을 5로 치환해도 똑같다. 이러면 정렬이고 나발이고 필요없다. 그냥 원패스로 계산 가능.
+
+class Solution:
+    def hIndex(self, citations):
+        n = len(citations)
+        papers = [0] * (n + 1)
+        # Count how many papers have each citation count (cap at n)
+        for c in citations:
+            papers[min(n, c)] += 1
+
+        # Find the h-index
+        k = n
+        s = papers[n]
+        while k > s:
+            k -= 1
+            s += papers[k]
+        return k
+
+이러면 압도적 시간복잡도 O(N)이 나온다.
 
 
 # 380. Insert Delete GetRandom O(1)

@@ -171,9 +171,92 @@ k = n 으로 놓은 것이다. 그리고 여기서 거꾸로 하나씩 줄여가
 
 ## Solution
 ```python
-class Solution:
+class RandomizedSet(object):
+
+    def __init__(self):
+        self.numMap = {}
+        self.numList = []
+        
+
+    def insert(self, val):
+        res = val not in self.numMap
+        if res:
+            self.numMap[val] = len(self.numList)
+            self.numList.append(val)
+        return res
+
+    def remove(self, val):
+        res = val in self.numMap
+        if res:
+            index = self.numMap[val]
+            lastVal = self.numList[-1]
+            self.numList[index] = lastVal
+            self.numList.pop()
+            self.numMap[lastVal] = index
+            del self.numMap[val]
+        return res
+        
+
+    def getRandom(self):
+        return random.choice(self.numList) # You can use random.sample but choice would pick one value for you.
+
 
 ```
 
 ## Key Takeway
-f
+이 문제의 경우 파이썬으로 접근하면, 평균적으로 O(1)으로 삽입, 삭제를 하기 위해 딕셔너리 즉 해시맵을 사용할 것이다.
+
+그러면 아래와 같은 식으로 문제를 접근할 것이고 문제가 풀린다.
+
+```python
+class RandomizedSet(object):
+
+    def __init__(self):
+        self.data = set()
+        
+
+    def insert(self, val):
+        if val not in self.data:
+            self.data.add(val)
+            return True
+        return False
+        
+
+    def remove(self, val):
+        if val in self.data:
+            self.data.remove(val)
+            return True
+        return False
+        
+
+    def getRandom(self):
+        import random
+        return random.sample(self.data, 1)[0]
+
+```
+
+실제로 insert()와 remove()메서드는 HashSet형태의 자료구조를 이용하라는 것이 출제의도가 맞다. getRandom()메서드의 경우,
+실제 모든 요소를 동일한 확률(에 근접하게) 뽑기 위해서는 순서가 없는 HashMap 기반의 자료구조로는 안되고 인덱스를 가지는 자료구조에
+저장한 후 그 인덱스를 랜덤하게 고르도록 한 뒤 그 값을 가져오게 해야한다.
+이를 명시적으로 구현하기 위해서는 HashSet 자료구조와 함께, 그에 담긴 값과 연결된 인덱스도 따로 배열로 관리해야한다는 것. 그러려면
+insert()메서드와 remove()메서드도 인덱스를 배열로 관리해줘야한다.
+
+insert()는 사실 어렵지 않다. 어떤 값이 주어지면, HashSet에 그게 있는지 확인해서 추가하는건 자연스레 O(1)이고,
+이제 그 값을 배열의 마지막에 저장한 뒤 자연스럽게 부여되는 인덱스를 활용하면 된다.
+
+단, remove()는 생각을 해야한다. 제거할 값이 HashSet에서야 어디에 있든 상관없이 O(1)으로 삭제되겠지만, 인덱스로 관리되는
+배열 내에서 그 요소가 만약 배열의 마지막이 아니라 처음이나 중간에 있다면 나머지 값들을 전부 밀어야 해서 O(1)이 안될 것이기 때문.
+
+그래서 HashSet 대신 HashMap을 활용해야 한다. 그러면 인덱스는 선형적으로 검색 안해도 바로 찾아낼 수 있다. 그러나 그렇다고 그
+인덱스에 해당하는 값만 빈칸으로 둔다거나 하면 나중에 getRandom() 메서드로 추출할 때 값이 빈 인덱스가 선택될 수도 있다. 그렇다고
+그 안에 다른 유효한 값을 넣으면 각 값들이 뽑힐 확률이 동일하지 않으니 문제가 된다.
+
+이 문제를 해결하려면 배열에서 어떤 값을 O(1)으로 삭제하는 방법은 맨 뒤에서 삭제하는 방법 뿐이라는 점을 활용해야 한다.
+따라서 배열의 마지막 값을 우리가 실제 삭제하려하는 위치에 덮어쓰고, 마지막 값은 없애버리는 것이다. 그러면 문제가 해결될 것이다.
+그리고 해시맵까지 업데이트해주면 끝날 것.
+
+getRandom() 메서드는 사실 파이썬의 경우 빌트인 함수를 쓰는게 맞아서 그냥 저런 함수가 있다고 알면 좋다.
+
+
+
+

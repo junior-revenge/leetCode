@@ -98,3 +98,59 @@ ListNode* mergeKLists(vector<ListNode*>& lists) {
     return ans->next;
 }
 ```
+
+# 24. Swap Nodes in Pairs
+
+Given a linked list, swap every two adjacent nodes and return its head. You must solve the problem without modifying the values in the list's nodes (i.e., only nodes themselves may be changed.)
+
+Example 1:
+
+Input: head = [1,2,3,4]
+
+Output: [2,1,4,3]
+
+Explanation:
+
+Example 2:
+
+Input: head = []
+
+Output: []
+
+Example 3:
+
+Input: head = [1]
+
+Output: [1]
+
+Example 4:
+
+Input: head = [1,2,3]
+
+Output: [2,1,3]
+
+## Solution
+
+```cpp
+ListNode* swapPairs(ListNode* head) {
+    if(head == nullptr) return head;
+
+    auto node = new ListNode(0, head);
+    auto ans = node;
+
+    while(node->next != nullptr) {
+        auto l = node->next;
+        auto r = l->next;
+        
+        if(r == nullptr) break;
+    
+        node->next = r;
+        l->next = r->next;
+        r->next = l;
+
+        node = l;
+    }
+
+    return ans->next;
+}
+```

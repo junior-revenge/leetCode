@@ -68,19 +68,101 @@ while문을 돌리면서 왼쪽포인터 높이와 오른쪽 포인터 높이를
 
 ## Solution
 ```python
+values = {
+    "I": 1,
+    "V": 5,
+    "X": 10,
+    "L": 50,
+    "C": 100,
+    "D": 500,
+    "M": 1000,
+}
 
+
+class Solution:
+    def romanToInt(self, s):
+        total = 0
+        i = 0
+        while i < len(s):
+            # If this is the subtractive case.
+            if i + 1 < len(s) and values[s[i]] < values[s[i + 1]]:
+                total += values[s[i + 1]] - values[s[i]]
+                i += 2
+            # Else this is NOT the subtractive case.
+            else:
+                total += values[s[i]]
+                i += 1
+        return total
 
 ```
 
 ## Key Takeway
+일단 로마자와 정수의 매핑을 기록해둔다.
+values = {
+    "I": 1,
+    "V": 5,
+    "X": 10,
+    "L": 50,
+    "C": 100,
+    "D": 500,
+    "M": 1000,
+}
 
+여기서 중요한 사실을 알아야 하는데, 각 로마자는 그 로마자보다 값이 작은게 그 앞에 오는 경우를 제외하고는
+언제나 수를 더한다는 점이다. 
+그래서 현재가 마지막 위치인지 확인하고( i + 1 < len(s) ), 아니라면 현재 위치의 값이 그 다음 위치의 값보다
+작은지 판단해서 작을 때는 그 다음 위치의 값에서 현재 위치의 값을 뺀 값을 더해주고 "두 칸"을 건너가야 한다. 
+그게 아니라면 그냥 현재 칸을 더해준다. 
+이 값을 빼준다는게 생각보다 어렵게 느껴질 수 있는데, 로마자 특성상 개별 기호 왼쪽에 오는 자기보다 작은 수는
+그 개별 기호에서 뺄셈을 하는 것이기 때문에 이게 맞다. IV면 4인 이유는 V에서 1(I)을 뺀 것이기 때문. VI는 더한 거고.
+그래서 뺄셈 처리 후에는 두 칸을 건너뛰어주고, 그게 아니라면 그 개별 기호보다 큰 값은 이후에 나타날 일이 없으므로
+그냥 더해주기만 하면 된다.
+
+이렇게 만해도 시간복잡도 공간복잡도 모두 O(1)이 나온다(문제의 조건 하에서). 이걸 아주 조금 더 개선하려면 CM, CD 같은 두 글자 숫자들을 매핑에 더해줘서 7개가 아니라 최대 13개까지 매핑해서 매번 순회때마다 이게 두 글자짜리 기호인지 한 글자짜리 기호인지 판단해서 건너뛰게 할 수도 있는데 복잡도를 바꿀정돈 아니다.
 
 # 12. Integer to Roman
 
 ## Solution
 ```python
+class Solution:
+    def intToRoman(self, num):
+        digits = [
+            (1000, "M"),
+            (900, "CM"),
+            (500, "D"),
+            (400, "CD"),
+            (100, "C"),
+            (90, "XC"),
+            (50, "L"),
+            (40, "XL"),
+            (10, "X"),
+            (9, "IX"),
+            (5, "V"),
+            (4, "IV"),
+            (1, "I"),
+        ]
 
+        roman_digits = []
+        # Loop through each symbol.
+        for value, symbol in digits:
+            # We don't want to continue looping if we're done.
+            if num == 0:
+                break
+            count, num = divmod(num, value)
+            # Append "count" copies of "symbol" to roman_digits.
+            roman_digits.append(symbol * count)
+        return "".join(roman_digits)
 ```
 
 ## Key Takeway
+이 문제의 경우 로마자를 정수로 바꾸는 것과 비슷하지만,
+숫자를 로마자로 표기하는 방법을 미리 숙지해둬야 안 헷갈릴 수 있다.
+예를 들어 140을 표시하는 방법은 CXXXX도 되고 CXL도 되고 CXXVVVV도 되지만,
+여기서 가장 응축이 되는 CXL이 옳은 표기법이다. 
+
+이건 되는 숫자부터 문자로 바꿔보는, 그리디 알고리듬 방식으로 접근하면 된다.
+직관적으로 떠올리기 쉽다.
+
+divmod()를 쓰면 자연스레 몫과 나머지로 된 튜플을 반환하니 유용하다.
+몫은 몫 갯수만큼 기호를 반복해 붙이고 나머지는 그대로 새로운 num으로 활용한다.
 

@@ -167,8 +167,80 @@ If target is not found in the array, return [-1, -1].
 
 You must write an algorithm with O(log n) runtime complexity.
 
+Example 1:
+
+Input: nums = [5,7,7,8,8,10], target = 8
+Output: [3,4]
+
+Example 2:
+
+Input: nums = [5,7,7,8,8,10], target = 6
+Output: [-1,-1]
+
+Example 3:
+
+Input: nums = [], target = 0
+Output: [-1,-1]
+
 ## Solution
 
 ```cpp
+vector<int> searchRange(vector<int>& nums, int target) {
+    auto siz = static_cast<int>(nums.size());
+    
+    auto left = 0;
+    auto right = siz - 1;
 
+    auto ans = vector<int> { -1, -1 };
+
+    while(left <= right) {
+        auto mid = (left + right) / 2;
+
+        if(nums[mid] == target) {
+            if(mid == 0 || nums[mid-1] != target) {
+                ans[0] = mid;
+                break;
+            }
+            else {
+                cout<<mid<<" "<<right<<endl;
+                right = mid - 1;
+                continue;   
+            }
+        }
+
+        if(nums[mid] > target) {
+            right = mid - 1;
+        }
+        else {
+            left = mid + 1;
+        }
+    }
+
+    left = 0;
+    right = siz - 1;
+
+    while(left <= right) {
+        auto mid = (left + right) / 2;
+
+        if(nums[mid] == target) {
+            if(mid == siz - 1 || nums[mid + 1] != target) {
+                ans[1] = mid;
+                break;
+            }
+            else {
+                left = mid + 1;
+                continue;   
+            }
+        }
+
+        if(nums[mid] > target) {
+            right = mid - 1;
+        }
+        else {
+            left = mid + 1;
+        }
+    }
+
+    return ans;
+}
 ```

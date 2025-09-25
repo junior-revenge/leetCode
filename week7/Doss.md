@@ -43,6 +43,21 @@ The substring starting at 12 is "thefoobar". It is the concatenation of ["the","
 
 ## Solution
 
+This problem asks us to check if a given string contains combinations of strings from the words array and return the starting indices of substrings that match. Before solving this problem, there are key points to consider: all strings in the words array have the same length, and these strings must be concatenated consecutively.
+
+This leads us to the sliding window approach. We can iterate through a certain range and check if each substring is a valid concatenation of the words. However, several challenges arise.
+
+First, simply iterating from 1 to N won't be sufficient. How can we ensure we cover all possible cases? Second, how should we handle overlapping concatenated strings in string s? The solution is simpler than it seems.
+
+We need to iterate through the range 1 to N, but set our starting points within the length of each word in words. If we denote the word length as k, we perform k * N iterations. This works because when we slide a window of length k, any consecutive combination of k-length strings will have a starting point within the first k positions.
+
+We also need a dynamic programming-like approach to efficiently check consecutive concatenated strings. For example, suppose words = ['wr', 'rw', 'ad'] and string s = 'wrrwadwrrw'. In this case, we should return [0, 2, 4]. To optimize this, we need to memoize previous results.
+
+Therefore, we use a hash map (dictionary) to track the count of consecutive words from words that appear in the current window. We check the validity at each step, and when we find a match, we slide the window by removing the leftmost k-length substring and continue checking. This achieves optimization while covering all possible cases.
+
+Let N be the length of string s, J be the length of the words array, and K be the length of each word in words.
+The final time complexity is O(K * N), and the space complexity is O(K * J).
+
 ```cpp
 vector<int> findSubstring(string s, vector<string>& words) {
     auto siz = static_cast<int>(s.size());
@@ -128,6 +143,26 @@ Output: -1
 
 ## Solution
 
+### Korean
+
+주어진 조건들을 보았을 때에 이진 탐색을 어렵지 않게 떠올릴 수가 있다. 하지만 단순히 mid index를 비교하여 좌우 이동을 하는 것만으로는 충분하지 못하다. 여기서 고려 할 부분은 오름차순으로 정렬 된 배열을 회전 이동을 했다는 것이다. 여기서 절반은 무조건 오름차순이라는 것이 보장되며, 나머지는 그렇지 못함을 알 수 있다.
+
+그렇다면 어느쪽이 오름차순으로 정렬 되었음을 어떻게 알 수가 있을까? 답은 간단하다. 그냥 첫 값과 마지막 값과 mid index와 비교하면 된다. 그래서 마지막 인덱스 값이 mid 인덱스 보다 크다면 오른쪽이 정렬 되었음을 알 수가 있다. 그 역도 마찬가지다. 그래서 우리가 찾는 값이 정렬 된 배열 속에 있다면 기존의 이진 탐색으로 해결 할 수가 있다.
+
+그렇지만 정렬되지 않은 곳이라면? 이 경우엔 명백히 정렬 된 배열 내에 없음을 확인한 후에 탐색을 한다. 그리고 이걸 똑같이 반복한다. 왜냐하면 정렬 된 배열 범위내에서 명백히 존재하지 않음을 확인했다면, 우리는 그런 탐색을 시도 할 필요가 없다. 하지만 나머지에 대해서는 명확하지 않고, 일말의 가능성이 남아있기에 탐색을 시도해보는 것이다. 
+
+그래서 만약에 존재한다면 찾을 수가 있을 것이고, 없다면 -1 을 반환할 것이다. 이렇게 이런 접근법을 통해 우리는 회전 이동한 배열에서 이진 탐색을 적용 할 수가 있다.
+
+### English
+
+Looking at the given constraints, we can easily think of binary search. However, simply comparing the mid index and moving left or right isn't sufficient. The key consideration here is that we have an ascending sorted array that has been rotated. We know that one half is guaranteed to be monotonically increasing, while the other half is not.
+
+So how can we determine which side is sorted in ascending order? The answer is simple. We just need to compare the first value, last value, and mid index. If the value at the last index is greater than the value at the mid index, we know the right half is sorted. The same logic applies in reverse. Therefore, if the target value we're looking for is within the sorted portion, we can solve it using conventional binary search.
+
+But what if it's in the unsorted portion? In this case, we first confirm that the target clearly doesn't exist within the sorted array, then we search the other half. We repeat this process because if we've clearly confirmed that the target doesn't exist within the sorted range, there's no need to attempt that search. However, for the remaining portion, it's unclear, but there's still a possibility, so we attempt the search there.
+
+Through this approach, if the target exists, we'll be able to find it; if not, we'll return -1. This way, we can apply binary search to a rotated sorted array.
+
 ```cpp
 int search(vector<int>& nums, int target) {
     auto left = 0;
@@ -184,6 +219,32 @@ Output: [-1,-1]
 
 ## Solution
 
+### Korean
+
+ 주어진 조건들을 보았을 때에 이진 탐색을 이용하여 풀 수 있음을 어렵지않게 떠올 수 있다. 하지만 단순하게 기존의 이진 탐색을 적용 하는 것으로는 부족하다. 어떻게 푸는 것이 좋을까?
+
+ 기본적으로 이진 탐색의 접근법은 존재 할 것으로 기대되는 범위를 반씩 줄여가며 탐색하는 것이 주된 골자다. 그렇기에 어떻게 반씩 좁혀가며 탐색을 할 수가 있을까. 우리가 찾는 target은 2개다. 어떠한 숫자의 시작 및 끝을 찾는 것인데(가령 중복 된 갯수로 존재 할 경우), 이를 충족하는 조건은 다음과 같다.
+
+ 시작점: 인덱스 i 에 대해, i 번쨰 값이 i - 1 번쨰 값 보다 크가.
+ 끝점: 인덱스 i에 대해, i 번째 값이 i + 1 보다 작다.
+
+ 이러한 점을 고려 해 보았을 때에 각각 arr[i] > arr[i-1], arr[i] < arr[i+1] 을 탐색하는 문제로 접근 할 수가 있다. 그리고 탐색 조건을 해당 숫자가 인근한 배열과 같이 같은지 다른지를 체크하는 것으로 확인이 가능하다.
+
+ 그래서 시간 복잡도는 2 * log N 이 되며, 공간 복잡도는 constant value가 된다.
+
+### English
+
+Looking at the given constraints, we can easily think of using binary search to solve this problem. However, simply applying conventional binary search isn't sufficient. How should we approach this?
+
+The fundamental approach of binary search is to reduce the search space by half while searching within the expected range. So how can we narrow down the search by half? We're looking for two targets: the starting and ending positions of a given number (when it exists as duplicates). The conditions that satisfy this are as follows:
+
+Starting point: For index i, the value at index i is greater than the value at index i-1.
+Ending point: For index i, the value at index i is less than the value at index i+1.
+
+Considering these points, we can approach this as searching for arr[i] > arr[i-1] and arr[i] < arr[i+1] respectively. We can confirm the search condition by checking whether the target number is the same or different from its adjacent array elements.
+
+Therefore, the time complexity is 2 * log N, and the space complexity is constant.
+
 ```cpp
 vector<int> searchRange(vector<int>& nums, int target) {
     auto siz = static_cast<int>(nums.size());
@@ -202,7 +263,6 @@ vector<int> searchRange(vector<int>& nums, int target) {
                 break;
             }
             else {
-                cout<<mid<<" "<<right<<endl;
                 right = mid - 1;
                 continue;   
             }

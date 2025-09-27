@@ -82,18 +82,44 @@ class Solution:
 ```
 
 
-# 13. Roman to Integer
+# 14. Longest Common Prefix
 
 ## Solution
 ```python
-
+class Solution(object):
+    def longestCommonPrefix(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: str
+        """
+        if not strs or len(strs) == 0:
+            return ""
+        min_len = min(len(s) for s in strs)   
+        if min_len == 0:                      
+            return ""
+        parts = []
+        for i in range(min_len):
+            for j in range(len(strs) - 1):
+                if strs[j][i] != strs[j + 1][i]:
+                    return "".join(parts)
+            parts.append(strs[0][i])
+        return "".join(parts)
 ```
 
 ## Key Takeway
 
-# 12. Integer to Roman
+이건 시간복잡도의 일반적인 상황에서의 최적화가 불가능한 문제다.
+단순히 문자열 중 가장 짧은 문자열을 찾아서, 그 문자열을 기준으로 첫 글자부터 하나씩
+문자열마다 돌아가며 조사를 하다가 틀린게 나오면 그때 멈추면 그게 최적 시간복잡도를 가질 것이다.
+그러면 시간복잡도가  O(Nm^2)가 나올 것이다(m은 가장 짧은 문자열 길이).
+				
+이걸 다른 find()메서드같은걸 활용해서 작성해도 좋지만 위와 같이 구성하면 충분히 풀 수 있다.
+다만 파이썬에서는 concatenation은 quadratic하다는 것을 잊지말고 + 대신 반드시 "".join()을 활용해주도록 하자.
 
-## Solution
+
+# 151. Reverse Words in a String
+
+ㄹ## Solution
 ```python
 
 ```

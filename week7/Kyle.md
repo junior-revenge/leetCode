@@ -119,11 +119,71 @@ class Solution(object):
 
 # 151. Reverse Words in a String
 
-ㄹ## Solution
+## Solution
 ```python
+
+class Solution(object):
+    def reverseWords(self, s):
+        parts = []
+        i = len(s) - 1
+
+        # walk from the end collecting words
+        while i >= 0:
+            # skip trailing / inter-word spaces
+            while i >= 0 and s[i] == ' ':
+                i -= 1
+            if i < 0:
+                break
+
+            # find the start of the word
+            j = i
+            while j >= 0 and s[j] != ' ':
+                j -= 1
+
+            # push the word [j+1 .. i]
+            parts.append(s[j + 1: i + 1])
+
+            # move to the char before the space
+            i = j - 1
+
+        return ' '.join(parts)
 
 ```
 
 ## Key Takeway
+
+뒤에서부터 시작해서
+빈칸을 발견하고
+거기서부터 뒤에까지 단어를 저장하고
+빈칸을 필요에 따라 추가하거나 지우고
+위 과정을 반복한다.
+
+그러면 쉽게 O(N) 해법을 구할 수 있다.
+
+처음엔 좀 지저분해도 아래와 같이 답변을 구성하고:
+```python
+class Solution(object):
+    def reverseWords(self, s):
+        ans = ''
+        s = s.lstrip()
+        start = len(s) - 1
+        end = len(s) - 1
+        while end >= 0:
+            s = s.rstrip()
+            start = len(s) - 1
+            end = len(s) - 1
+            while start >= 0 and s[start] != ' ':
+                start -= 1
+            ans = ''.join([ans, s[start + 1: end + 1], ' '])
+            if start < 0:
+                break
+            s = s[:start]
+        ans.join(s[0:end + 1])
+
+        return ans.rstrip()
+```
+이후 이를 가지치기한다.
+
+
 
 

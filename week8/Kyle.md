@@ -45,7 +45,7 @@ class Solution:
 글자들이 가장 위쪽 줄(index 0)과 가장 아랫 줄(index len(s) - 1)사이를 튕긴다는 점에 착안하여 아래와 같은 해법으로
 풀 수도 있다. 기본적인 아이디어는 맨 윗줄이나 맨 아랫줄에 부딪힐때마다 인덱스를 늘리거나 줄이는데 그게 부딪힐때마다 방향이 바뀌도록 설정해준 것.
 다만 concatenation을 안쓰려고 하다보니 조금 복잡한 문법이 되었기도 하다. 
-
+```python
 class Solution:
     def convert(self, s, numRows):
         if numRows == 1:
@@ -62,7 +62,7 @@ class Solution:
             index = index - 1 if going_up else index + 1
 
         return "".join("".join(r) for r in rows)
-
+```
 
 # 28. Find the Index of the First Occurrence in a String
 

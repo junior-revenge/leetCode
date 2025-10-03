@@ -68,11 +68,40 @@ class Solution:
 
 ## Solution
 ```python
-
+class Solution(object):
+    def strStr(self, haystack, needle):
+        if len(needle) == 0:
+            return 0 
+        complete = True
+        i = 0
+        while i < len(haystack) - len(needle) + 1:
+            for x in range(len(needle)):
+                complete = True
+                if haystack[i + x] != needle[x]:
+                    complete = False
+                    break
+            if complete:
+                return i
+            i += 1
+        return -1
 ```
 
 ## Key Takeway
+brute force로 풀어보자.
+일단 haystack의 각 인덱스에 대해서, 
+needle의 각 글자를 하나씩 대조해보고,
+만약 중간에 하나라도 일치하지 않을 경우, 그 인덱스에 대해서는 작업이 끝났다고 보고 인덱스를 1 증가시켜 동일한 작업을 반복해야 하고,
+전부 대조해도 동일하다면 작업을 중단하고 그 위치에서의 인덱스를 반환해야 할 것이다.
+반복문 두 개를 사용하면 쉽게 가능하다.
 
+
+
+시간복잡도는 O(MN)으로, 더 최적화할 필요는 없다.
+				
+파이썬 슬라이스를 쓰고 싶으면 아래와 같이 하면 된다:
+```python
+if haystack[i:i+len(needle)] == needle: return i
+```
 
 # 68. Text Justification
 

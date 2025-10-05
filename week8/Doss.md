@@ -21,6 +21,14 @@ Explanation: The string s has been split into three parts, each part has 2 chara
 
 ## Solution
 
+### Explanation
+
+This problem is about string manipulation, using license key formatting as an example. The requirement is that the string must be divided into groups of K characters, except the first group which can be shorter. With this condition, we can use the modulo operation since the first group can have variable length up to K.
+
+First, we concatenate the string by removing all dashes and joining the groups. Then we need to group the characters into K-length segments, except for the first one. How do we determine the length of the first group? Simply use the modulo operator—the remainder gives us the length of the first group. Then we just insert dashes between each K-length character group.
+
+### Code
+
 ```cpp
 string licenseKeyFormatting(string s, int k) {
     auto buf = stringstream(s);

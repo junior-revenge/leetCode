@@ -1,30 +1,20 @@
-# Problem 448 FindAllNumbersDisappearedInAnArray
+# Problem242. Valid Anagram
 
-## Brute Force
+## Solution
 
 ```commandline
-    HashSet<Integer> set = new HashSet<>();
-    for(int n : nums){
-        set.add(n);
+    public boolean isAnagram(String s, String t) {
+        // using Arrays's sort. because anagram is a word made by using the letter in different order.
+        // so we can check this ascending order.
+        // 0. before we can check with length.
+        if(s.length() != t.length()) return false;
+        // 1. make an array
+        char[] arrs = s.toCharArray();
+        char[] arrt = t.toCharArray();
+        // 2. sort an array;
+        Arrays.sort(arrs);
+        Arrays.sort(arrt);
+        // return boolean value it is equal or not
+        return Arrays.equals(arrs,arrt);
     }
-    List<Integer> list = new ArrayList<>();
-    for(int i = 1; i<= nums.length; i++){
-        if(!set.contains(i)) list.add(i);
-    }
-    return list;
-```
-
-## Solution.
-```commandline
-    int index = -1;
-    for(int i = 0; i< nums.length;i ++){
-        index = Math.abs(nums[i])-1;
-
-        if(nums[index]>0) nums[index] *=-1;
-    }
-    List<Integer> li = new ArrayList<>();
-    for (int i = 0; i<nums.length; i++){
-        if(nums[i]>0) li.add(i+1);
-    }
-    return li;
 ```

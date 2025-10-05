@@ -108,11 +108,141 @@ if haystack[i:i+len(needle)] == needle: return i
 ## Solution
 ```python
 
+class Solution(object):
+    def fullJustify(self, words, maxWidth):
+        output = []
+        end = False
+        n = len(words)
+        i = 0  # index into words
+
+        while i < n:
+            words_to_justify = []
+            count = 0
+            # pack from i forward (same logic, just using index)
+            for k in range(i, n):
+                if len(words[k]) <= maxWidth and len(words[k]) <= maxWidth - count:
+                    count += len(words[k])
+                    words_to_justify.append(words[k])
+                    if count + 1 <= maxWidth:
+                        count += 1
+                else:
+                    break
+
+            taken = len(words_to_justify)
+            i += taken  # advance instead of del words[:taken]
+
+            # mark last row if no words remain
+            if i == n:
+                end = True
+
+            # === build justified line (ARITHMETIC, no regex) ===
+            if end or len(words_to_justify) == 1:
+                # last line or single word -> left-justify
+                justified = ' '.join(words_to_justify)
+                while len(justified) < maxWidth:
+                    justified += ' '
+            else:
+                # fully-justify by distributing spaces once
+                words_len = sum(len(w) for w in words_to_justify)
+                spaces = maxWidth - words_len
+                gaps = len(words_to_justify) - 1
+                q, r = divmod(spaces, gaps)  # base and extras
+
+                parts = []
+                for idx, w in enumerate(words_to_justify[:-1]):
+                    parts.append(w)
+                    # at least 1 space between words + q base + 1 for first r gaps
+                    parts.append(' ' * (q + (1 if idx < r else 0)))
+                parts.append(words_to_justify[-1])
+
+                justified = ''.join(parts)
+
+            output.append(justified)
+
+        return output
 
 
 ```
 
 ## Key Takeway
+
+문제가 복잡해보이지만 막상 할 일이 많아서 그렇지 brute force로 푼다면 그렇게 어렵기까지만한 문제는 아니다.
+
+하나의 행에 들어갈 단어들을 그리디하게 추려내고,
+그 단어들 사이에 전체 조건에 맞게 빈칸을 집어넣어주고
+단어가 하나뿐인 경우와 마지막 행에 대한 특별한 처리를 해주면 된다.
+
+아래는 성공한 시도:
+
+```python
+import re
+
+class Solution(object):
+    def fullJustify(self, words, maxWidth):
+        output = []
+        end = False
+        while len(words) > 0:
+            words_to_justify = []
+            count = 0
+            for i in range(len(words)):
+                if len(words[i]) <= maxWidth and len(words[i]) <= maxWidth - count:
+                    count += len(words[i])
+                    words_to_justify.append(words[i])
+                    if count + 1 <= maxWidth:
+                        count += 1
+                else:
+                    break
+            del words[:len(words_to_justify)]
+
+            # mark last row if no words remain
+            if len(words) == 0:
+                end = True
+                
+            ## you justify
+            justified = ' '.join(words_to_justify)
+
+            if not end:
+                remaining_space = maxWidth - len(justified)
+                while remaining_space > 0:
+                    # find a space after a word and add space
+                    gaps = [m for m in re.finditer(r' +', justified)]
+                    if gaps:
+                        # add to the leftmost gap with the fewest spaces
+                        min_len = min(len(m.group(0)) for m in gaps)
+                        for m in gaps:
+                            if len(m.group(0)) == min_len:
+                                insert_at = m.end()
+                                justified = justified[:insert_at] + ' ' + justified[insert_at:]
+                                break
+                    else:
+                        # if there's only one word, pad at the end
+                        while len(justified) < maxWidth: 
+                            justified += ' '
+                        break
+                    remaining_space -= 1
+            else:
+                while len(justified) < maxWidth: 
+                            justified += ' '
+            output.append(justified)
+
+        return output
+```
+여기서 비효율적인 부분을 하나씩 개선해나가면 충분한 답이 된다.
+일단 del words[:len(words_to_justify)] 이거는 삭제를 할 때마다 요소를 전부 끌어오는
+O(N)의 시간복잡도를 가진 작업이므로 인덱스를 하나 추가해 활용해서 이를 방지한다.
+새 코드에서는 while문 안에서 i를 활용하고 한 행에 넣을 단어들의 길이를 잰 뒤 taken에 저장하고
+그 taken만큼 i를 늘린다. 
+
+그리고 정규식을 사용하기 보다는 divmod()를 활용해 한 번에 넣을 빈칸을 계산해서 넣어준다.
+어려울 것 같아도 아주 쉬운데, 일단 글자의 수를 다 더해서 빈칸이 몇개가 들어가야하는지 샌 뒤,
+단어들의 갯수 - 1을 해서 들어가야할 gap의 수를 구한다.
+그리고 빈칸의 갯수를 gap의 수로 나눠주고 몫을 q로 나머지는 r로 저장한다. 
+그리고 아래와 같이 붙인다:
+					parts.append(' ' * (q + (1 if idx < r else 0)))
+여기서 괄호 내부에선 공통적으로 q만큼 들어가야 하니 그렇게 넣고, 그러고도 남은 나머지 빈칸은 빈칸을 넣는 중인 그 단어의 인덱스가 나머지보다 작을 경우에 하나씩 넣어준다.
+이게 헷갈릴 수 있는데, 예를 들어 단어가 3개있고 빈칸이 5개 들어가야하면, 몫 1 나머지 2니까,
+인덱스 0 단어 뒤에 일단 몫(1)만큼 더하고 그리고 나머지가 2인데 인덱스가 0이니까 아직 인덱스가 작으니 나머지(1)만큼 또 더해준다. 인덱스가 1일때도 그렇게하고 인덱스가 2일 때는 나머지 1을 안 더해서 1만 더해지게 된다. 나머지와 인덱스를 활용해 자연스레 앞에서부터 남은걸 채워넣게 한 것.
+
 
 
 

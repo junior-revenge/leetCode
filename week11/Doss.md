@@ -60,3 +60,42 @@ string multiply(string num1, string num2) {
     return ret;
 }
 ```
+
+# 46. Permutations
+
+Given an array nums of distinct integers, return all the possible . You can return the answer in any order.
+
+## Solution
+
+```cpp
+vector<vector<int>> ans;
+
+vector<vector<int>> permute(vector<int>& nums) {
+    auto cand = vector<int>();
+    auto siz = nums.size();
+
+    for(int i=0;i<siz;i++) {
+        cand.push_back(i);
+    }
+
+    auto box = vector<int>();
+
+    track(nums, cand, box);
+
+    return ans;
+}
+
+void track(vector<int>& nums, vector<int> cand, vector<int>& box) {
+    if(cand.empty()) ans.push_back(box);
+
+    for(auto i=0;i<cand.size();i++) {
+        auto idx = cand[i];
+        auto cpy = cand;
+        cpy.erase(cpy.begin() + i);
+
+        box.push_back(nums[idx]);
+        track(nums, cpy, box);
+        box.pop_back();
+    }
+}
+```

@@ -191,7 +191,45 @@ matched 숫자도 1 줄인다.
 
 ## Solution
 ```python
-
+class Solution(object):
+    def isValidSudoku(self, board):
+        cols = defaultdict(set)
+        rows = defaultdict(set)
+        squares = defaultdict(set) # key = (row / 3 , column / 3)
+        
+        for r in range(9):
+            for c in range(9):
+                if board[r][c] == ".":
+                    continue
+                if (board[r][c] in rows[r] or
+                    board[r][c] in cols[c] or 
+                    board[r][c] in squares[(r // 3, c // 3)]): # board[r][c]값이 r행이나 c열이나 그 사각형에있는지 확인
+                    return False
+                cols[c].add(board[r][c])
+                rows[r].add(board[r][c])
+                squares[(r // 3, c // 3)].add(board[r][c])
+        return True
 ```
 
 ## Key Takeway
+
+헷갈리지 말아야 할 것은, 이미 채워진 숫자만 고려하는 것이라서 이 전체가 정답이 있는 스도쿠 문제인지는 중요하지 않고
+현재 적혀있는 값중에 오류가 있는지만 파악해서 정답을 내면 된다.
+
+기본적으로 brute force가 가능한 문제다.
+그래서 그런식으로 생각의 밑그림을 깔아놓고
+1번과 2번과 3번을 따로 조사한 뒤 결과를 합쳐 결론을 도출하면 된다. 
+
+매 행과 열을 하나씩 조사할 때는 hash set을 활용해 중복값이 있는지 조사하면 되겠다. (defaultdict(set)을 활용해 hashset 만드는 방법 익혀두기)
+이렇게 하면 hash set 하나 당 시간복잡도는 한 면이 N개의 숫자가 있다면 O(N^2)일 것이다.
+
+부분의 구조가 반복되는 방식이므로 DP를 떠올릴 수 있는데, 일단 여기서는 그게 무한히 재귀되지 않고,
+사각형 크기가 정해져있고 조사할 범위도 정해져 있다. 9X9 사각형 전체를 한 번 조사하고
+그 다음에 3X3만 9개 더 조사하면 끝이 난다. 행과 열 조사할때도 행만 쭉 조사하는거랑 열만 쭉 조사하는거랑 어떤 상관성이 (설령 있더라도) 없다. 그냥 선형적으로 3 가지 사항을 조사하면 끝인 것. (행이랑 열이랑 서로 숫자가 중복되면 어떡하지 같은 고민 안해도 되는 것. 행 안에서 열 안에서 각각 중복이 없기만 하면 노상관)
+
+위에서 행과 열을 O(9^2)로 두 개의 hash setㅇ르 활용해 조사했고 이제 9개의 3X3 미니 사각형들을 또 별도의 hash set을 하나씩 할당해서
+조사해야 한다. (3X3은 행이나 열 단위로 조사하는게 아님을 주의할 것) 그럼 여기서도 시간복잡도는 9칸씩 가진 미니사각형
+9개를 조사하는 것이니 O(9^2)가 또 나온다.
+
+공간복잡도 역시 9^2 크기의 hash set을 3개 유지할거라 그냥 O(9^2)가 나온다.
+

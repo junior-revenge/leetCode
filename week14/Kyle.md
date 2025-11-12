@@ -1,0 +1,103 @@
+
+# 54. Spiral Matrix
+
+## Solution
+```python
+class Solution:
+    def spiralOrder(self, matrix):
+        result = []
+        rows, columns = len(matrix), len(matrix[0])
+        up = left = 0
+        right = columns - 1
+        down = rows - 1
+
+        while len(result) < rows * columns:
+            # Traverse from left to right.
+            for col in range(left, right + 1):
+                result.append(matrix[up][col])
+
+            # Traverse downwards.
+            for row in range(up + 1, down + 1):
+                result.append(matrix[row][right])
+
+            # Make sure we are now on a different row.
+            if up != down:
+                # Traverse from right to left.
+                for col in range(right - 1, left - 1, -1):
+                    result.append(matrix[down][col])
+
+            # Make sure we are now on a different column.
+            if left != right:
+                # Traverse upwards.
+                for row in range(down - 1, up, -1):
+                    result.append(matrix[row][left])
+
+            left += 1
+            right -= 1
+            up += 1
+            down -= 1
+
+        return result
+```
+
+## Key Takeway
+이 문제를 풀려고 하다보면 우선 하나하나 케이스를 따져보고, 반복되는 패턴이 있으니 재귀적으로 풀 수 있지 않을까 혹은 DP로 접근할 수 있지 않을까 착각할 수 있다.
+
+그러나 실제로 코드를 짜다보면, 반복은 왼->오, 위->아래, 오->왼, 아래->위가 점점 더 안쪽 사각형으로 들어가면서 반복은 되는데, 그 반복 대상이 되는 실제 matrix의 값들이 계속 (체계적이긴 하지만) 달라진다.
+
+그래서 바깥을 먼저 처리하고 바깥 한줄씩 벗겨낸 안쪽 matrix에 대해서 똑같은 연산을 하라고 할 수가 없다. 왜냐면 그 안에 들어가있는 값을 matrix에서 참조해야하는데 그러면 그때마다 matrix를 또 복잡한 방식으로 껍질(최와곽 값들)을 잘라서 전달해야하는데 그것부터가 엄청 실수하기 좋기 때문. 
+
+문제를 풀어보려고 아래와 같이 다가갈 순 있는데, 이러면 저 인덱스 하나하나 설정하느라 머리가 터진다.
+
+m = matrix.length
+n = matrix[0].length
+
+first round. 
+matrix[0][0] matrix[0][1] ... matrix[0][n-1]    n개
+matrix[1][n-1] matrix[2][n-1] ... matrix[m-1][n-1]   m - 1개
+matrix[m-1][n-2] matrix[m-1][n-3] ... matrix[m-1][0] n - 1개
+matrix[m-2][0] matrix[m-3][0] ... matrix[1][0] m - 2개
+
+second round
+matrix[1][1] matrix[1][2] ... matrix[1][n-2] n-1개
+matrix[2][n-2] matrix[3][n-2] ... matrix[m-2][n-2] m -3개
+matrix[m-2][n-3] matrix[m-2][n-4] ... matrix[m-2][1]  n-3개
+matrix[m-3][1] matrix[m-4][1] ... matrix[2][1]
+
+...
+
+따라서 첫 4줄 (왼->오, 위->아래, 오->왼, 아래->위) 정도만 빠르게 해보고, 전체 순회를 while문으로 묶은 뒤 조건은 매트릭스 안에 들어있는 값들의 길이만큼 결과배열이 채워질때까지로 하고, 4가지 이동(왼->오, 위->아래, 오->왼, 아래->위) 에 대해 별도의 로직(4개의 for문)으로 이어붙이게 한 뒤, 그 때 이어붙일때의 바운더리, 즉 경계값을 매 while문마다 업데이트해주는 방식으로 접근하는 것이 가장 가독성이 좋다.
+(이런 문제는 당연히 특별한 최적화가 불가능하기에 시간복잡도나 공간복잡도는 다른 접근을 활용하더라도 O(행X열) 그리고 O(1)이다.)
+
+즉 이 문제는, 사실 대단한 문제가 아니다. 그냥 하나의 선형적인 배열을 둘둘 말아놨을 뿐이라서, 결국 어떤 선형 배열을 index 0부터 끝까지 딱 한번 순회하면 끝인데, 다만 중간중간 거기에 접근하는 인덱스가 차원이 하나 추가되어 좀 더 복잡해질 뿐, 그냥 배열 하나 순회해서 그 값을 저장한다 뿐이다.
+
+특히 처음에 '왼'과 '위'를 둘 다 0으로 놓고, '오'와 '아래'를 각각 열의 끝, 행의 끝으로 놓으면서 이 해법의 간결함이 드러난다. 4개의 for문에서는 왼->오 이동을 left에서 right까지 그러나 붙이는건 matrix[첫행][iterator] 이런 식으로 붙인다. 마찬가지로 위->아래 이동을 위해서는 이번엔 위+1(1 더한게 디테일)에서 아래까지 순회하면서 matrix[iterator][마지막열]를 붙인다. 그리고 밑바닥의 오->왼 이동에서는 반대로 '마지막 열 - 1'에서 시작해서 하나씩 내려오면서 두번째열(이게 위에 적어놓은 예시와 좀 달라지는 부분)까지 내려오며 matrix[마지막행][iterator]를 더하고, 마지막으로 아래->위 이동에서는 맨 마지막에서 두번째 행부터 두번째 행까지 1씩 거꾸로 타고올라오면서 matrix[iterator][첫열] 값들을 더해온다. 이 때, 오->왼과 아래->위에서는 if문을 걸어줘야 하는데, 오->왼에서는 만약 up과 down이 만나버리면 더 진행하면 안되고, 아래->위에서는 이미 좌우가 만나버리면 진행하면 안되므로 if문을 걸어 그것을 방지하고 있다.
+
+이렇게 한바퀴 돌고나서 왼쪽 첫 열과 맨 윗 행은 1씩 값이 증가하고, 맨 마지막 열과 맨 마지막 행은 1씩 값을 감소시킨다. 그리고 똑같은 작업을 반복하면 결국 원하는 값을 얻을 수 있게 된다.
+
+아이디어는 안어려워서 한 번 해보면 괜찮은데, 처음에 좀 당황스러울 수 있는 문제.
+
+	
+
+# 48. Rotate Image
+
+## Solution
+```python
+
+```
+
+## Key Takeway
+
+
+
+# 73. Set Matrix Zeroes
+
+## Solution
+```python
+
+```
+
+## Key Takeway
+
+
+

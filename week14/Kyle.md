@@ -83,11 +83,65 @@ matrix[m-3][1] matrix[m-4][1] ... matrix[2][1]
 
 ## Solution
 ```python
+class Solution(object):
+    def rotate(self, matrix):
+        left = 0
+        top = 0
+        right = len(matrix) - 1 
+        bottom = len(matrix) - 1 
+
+        while left < right and top < bottom:
+
+            for i in range(right - left):
+                (
+                    matrix[top + i][right], 
+                    matrix[bottom][right - i], 
+                    matrix[bottom - i][left], 
+                    matrix[top][left + i]
+                ) = (
+                    matrix[top][left + i], 
+                    matrix[top + i][right], 
+                    matrix[bottom][right - i], 
+                    matrix[bottom - i][left]
+                ) 
+            left += 1
+            top += 1
+            right -= 1
+            bottom -= 1
 
 ```
 
 ## Key Takeway
+이건 로직만 보면 쉬운 문제.
 
+[0, 0] -> [0, n-1]
+[0, 1] -> [1, n-1]
+이런식의 이동이 이루어진다.
+
+그러나, 문제는 이게 in-place라는 점. 이게 in-place라는건 다시말해 원래 값을 최종 위치 값으로 바로 옮길 수 없다는 뜻이다.
+하나의 값을 최종위치로 옮기면 그 최종위치의 있던 값도 바로 최종위치로 가야하고 그 위치에 있던 값도 자기 최종위치로 가야한다.
+
+단, 이거는 90도 턴이고, 따라서 하나의 값을 최종위치로 옮길 때 그에 영향받는 다른 값들도 3번 더 옮기면 문제가 해결된다.
+1을 3위치로 옮기면 3을 9위치로 옮기고 9를 7위치로 옮기고 7을 1위치로 옮기면 괜찮다는 뜻.
+다행히 파이썬은 이게 정말 쉽다. 
+
+따라서 껍질마다 for문을 돌리면 된다.
+
+이게 근데 헷갈릴 수 있다. 일단 아래와 같이 3단계로 분리해서 생각하는 훈련을 해야 한다.
+1)left-top -> right-top, right-top -> right-bottom, right-bottom -> left-bottom, left-bottom -> left-top 이 4개의 운동
+2) 위 1번의 운동에서 각 운동에서 변화하는 것이 행인지 열인지 파악해서 행이나 열에서 i를 더하거나 빼주기. (왼->오 운동과 위->아래 운동은 i를 더해주겠지만 나머지 둘은 빼줘야한다)
+3) 안쪽 껍질로 이동하기. 이동하기 위해서는 시작값과 끝값 모두 변해야 한다.
+우선 시작값만 생각하면, left-top -> right-top이동에서는 시작 행/열이 1칸 늘어야 하고, right-top -> right-bottom이동에서는 시작행만 1칸 늘어나면 된다. 
+right-bottom -> left-bottom이동에서는 시작행/열은 늘어날게 없고 left-bottom -> left-top이동에서는 시작열만 1칸 늘어난다. 이렇게 하고서 끝값은 일괄적으로 1씩 줄여야 한다.
+이걸 처음해볼땐 실수하기가 쉽다. 특히 여기서 중요한건 끝값을 줄이는 방식이다. 4X4행렬에서는 시작과 끝을 모두 조절한 뒤엔 2X2 행렬을 따져야 하지만,
+3X3행렬에서는 시작과 끝을 모두 조절한 뒤에 1X1행렬만 남는다. 즉 끝-시작이 결국 2가 빠져야 한다. 이래서 시작과 끝값 모두 줄어야 한다.
+그래서 이걸 간결하게 줄이려면 (원래 길이 - 현재 길이) 같은 방식으로 줄이면 답이 없고... '왼쪽', '오른쪽', '위', '아래'와 같이 포인터 4개를 활용하는게 제일 효과적이다.
+여기서 포인터 4개 안고르면 나중에 엄청 헤맨다.. 
+
+파이썬 swapping syntax를 정확히 이해해야 함(우항이 좌항에 대입됨)은 물론이고
+괄호 들여쓰기를 잘못하면 4개 값이 한 위치에 다 때려박아지니 그것도 주의해야한다.
+
+각 요소가 한번씩 방문되므로 시간복잡도는 O(M) (M은 요소의 갯수), 공간복잡도는 O(1)이 된다. in-place니까.
 
 
 # 73. Set Matrix Zeroes

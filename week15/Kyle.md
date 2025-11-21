@@ -82,9 +82,41 @@ ransomnote의 글자들을 하나씩 빼다가 더 뺄 수 없으면 False반환
 
 ## Solution
 ```python
+class Solution:
+    def isIsomorphic(self, s, t):
 
+        mapping_s_t = {}
+        mapping_t_s = {}
+
+        for c1, c2 in zip(s, t):
+
+            # Case 1: No mapping exists in either of the dictionaries
+            if (c1 not in mapping_s_t) and (c2 not in mapping_t_s):
+                mapping_s_t[c1] = c2
+                mapping_t_s[c2] = c1
+
+            # Case 2: Either mapping doesn't exist in one of the dictionaries or Mapping exists and
+            # it doesn't match in either of the dictionaries or both
+            elif mapping_s_t.get(c1) != c2 or mapping_t_s.get(c2) != c1:
+                return False
+
+        return True
 ```
 
 ## Key Takeway
 
+처음엔 글자별로 갯수세서 그 숫자들 패턴만 맞추면 되리라 생각했는데,
+공간적인 관계정보도 보존해야한다.
+s = "bbbaaaba"
+t = "aaabbbba"
 
+이 둘은 isomorphic하지 않기 때문. 특별히 대단한 해법은 없고, 결국 글자간의 매핑을 하나하나 경우를 나눠 따져봐야 한다.
+그래서 s의 글자들이 t로 매핑되는 경우와 t의 글자들이 s로 매핑되는 경우를 비교해야하기 때문에 맵을 두개 활용한다.
+두 문자열의 길이가 같다고 가정하기 때문에, 각 글자를 하나씩 같이 비교하는데
+1)만약 둘 다 각자의 매핑에 추가된적이 없으면 서로를 교환해서 추가한다. 즉 s의 첫글자가 a고 t의 첫글자가 b면
+a를 b로 그리고 b를 a로 매핑한다.
+
+2)만약 두 글자중 한쪽만 매핑이 되어있거나 둘 다 매핑이 되어있는데, 그게 지금 같이 비교하는 두 글자 사이의 매핑이 아니라
+다른 글자와의 매핑이면 false를 반환해버린다. 즉 a와 b 그리고 b와 a를 과거에 매핑해놨는데 다시 만난 a가 이번엔 b가 아니라 c로 매핑되어있으면 False 날리는 것.
+
+이 경우를 다 통과하면 True를 반환해준다.  isomorphic에 대한 개념을 이해하는데 시간을 쓰면 easy치곤 푸는데 고심할 수 있는 문제.

@@ -57,12 +57,26 @@ in-place로 바꾸는 문제인데 당연히 board 복사본을 운영하면 너
 
 ## Solution
 ```python
+class Solution:
+    def canConstruct(self, ransomNote, magazine):
+        mmap = defaultdict(int)
 
+        for char in magazine:
+            mmap[char] += 1
 
+        for char in ransomNote:
+            mmap[char] -= 1
+            if mmap[char] < 0:
+                return False
+
+        return True
 ```
 
 ## Key Takeway
-
+아주 심플한 문제.
+처음엔 두 문자열 ransomnote와 magazine에 대해 각각 해시맵을 고안하고
+서로 비교하겠다고 생각했지만, 굳이 그럴것도 없이 해시맵 하나에 매거진을 때려넣고
+ransomnote의 글자들을 하나씩 빼다가 더 뺄 수 없으면 False반환하면 된다.
 
 # 205. Isomorphic Strings
 

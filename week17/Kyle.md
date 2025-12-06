@@ -69,8 +69,57 @@ class Solution(object):
 
 ## Solution
 ```python
+class Solution(object):
+    def containsNearbyDuplicate(self, nums, k):
+        last = {}
+
+        for i, num in enumerate(nums):
+            if num in last and i - last[num] <= k:
+                return True
+            last[num] = i
+
+        return False
 
 ```
 
 ## Key Takeway
 
+Solution이라고 제공된 것과는 좀 다르게 접근했는데, 어찌되었든 해시 테이블을 사용하면 충분히 
+최적화된 해법으로 풀 수 있다. 결국 순회를 하면서 지나온 값들의 인덱스 정보를 필요한 형태로 저장하고
+인출할 때 해시맵을 쓰면 되니까.
+
+그래서 일단 해시맵이 필요하다고 생각했고, nums를 돌리면서 맵에 없으면 인덱스를 저장했다.
+그리고 거기서 더 뭘 하면 안되므로 continue를 불러줬고, 그걸 통과하면 이제 핵심 로직인 거리가 k이내인지를 확인했고
+이내면 참을 반환. 
+그런데 이렇게만 하면 같은 숫자가 여러번 나올 경우 처음 나온 시점의 인덱스만 기억하게 되어서 정확히 답을 낼 수가 없는데,
+그래서 이렇게 조건에 만족하지 못했지만 한번 나왔던 인덱스의 경우 새로 업데이트를 꼭 해주도록 했다.
+
+```python
+class Solution(object):
+    def containsNearbyDuplicate(self, nums, k):
+        index_map = defaultdict(int)
+
+        for index, num in enumerate(nums):
+            if num not in index_map:
+                index_map[num] = index
+                continue
+            
+            if abs(index_map[num] - index) <= k:
+                return True
+            index_map[num] = index
+        
+        return False
+```
+그래서 이렇게 풀면 충분히 시간복잡도와 공간복잡도 O(N)이 된다. 이 로직을 간소화 하면 다음과 같다: 
+```python
+class Solution(object):
+    def containsNearbyDuplicate(self, nums, k):
+        last = {}
+
+        for i, num in enumerate(nums):
+            if num in last and i - last[num] <= k:
+                return True
+            last[num] = i
+
+        return False
+```

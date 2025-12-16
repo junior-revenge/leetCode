@@ -128,7 +128,47 @@ nums배열을 순회하면서 일단 첫 숫자는 첫 범주의 시작점으로
 
 ## Solution
 ```python
+class Solution(object):
+    def merge(self, intervals):
 
+        intervals.sort(key=lambda x: x[0])
+
+        merged = []
+        for interval in intervals:
+            if not merged or merged[-1][1] < interval[0]:
+                merged.append(interval)
+            else:
+                merged[-1][1] = max(merged[-1][1], interval[1])
+
+        return merged
 ```
 
 ## Key Takeway
+쉬운 문제인것 같지만 사실 고려할게 많다. 하나라도 놓치면 헤매게 된다.
+
+1) 정렬이 안되어있다. 따라서 정렬을 해주어야 쉽게 합치기가 가능하다.
+2) 합칠 때 왼쪽 interval의 시작값과 오른쪽 interval의 끝값으로 언제나 합쳐진다고 가정하면 안된다. 정렬후에 오른쪽에 위치한 interval이 아예 왼쪽에 포함되는 경우도 있다.
+		특히 정렬할 때 첫값만 고려하는 경우 이 경우가 대처가 안된다. 따라서 끝값을 max()로직으로 감싸줘야 한다. 
+3) 위 경우를 다 고려해도 한번 합친 interval에 그 다음 interval을 고려할 때 합친 결과랑 비교가 안된다. 
+
+그래서 이걸 다 고려한 답안은 다음과 같다.
+
+class Solution:
+    def merge(self, intervals):
+			intervals.sort(key=lambda x: x[0])
+			merged = []
+			for interval in intervals:
+				if not merged or merged[-1][1] < interval[0]:
+					merged.append(interval)
+				else:
+					merged[-1][1] = max(merged[-1][1], interval[1])
+			return merged
+			
+			
+우선 람다로 정렬을 하고, 개별 인터벌에 대해 merged가 비어있거나, merged에 저장된 마지막 인터벌의 끝값이 현재 인터벌의 시작값보다 작으면
+현재 인터벌을 merged에 추가한다. 이 경우 서로 겹치지 않기 때문. 
+그게 아닌 경우(즉 포함이 되었든 겹쳤든 뭐든), merged 배열의 마지막 인터벌의 끝값을 업데이트해버리는데, 기존값과 현재 인터벌의 끝값만 비교한다.
+구간끼리 겹치는 경우를 다양하게 나누는 것보다, 정렬한뒤에 시작값을 기준으로 판단하되, 이미 저장된 인터벌의 시작값보다는 새 인터벌의 시작값이 작지 않을테니(정렬했으니)
+겹치는게 확실하면 이미 저장된 인터벌의 끝값만 업데이트해주고 마는 것이 효과적인 전략인 것.
+
+시간복잡도는 O(NlogN)이 나오고 공간복잡도는 inplace로 했다면 정렬만 고려해서 O(logN)이겠지만 그게 아니면 O(N)일 것.
